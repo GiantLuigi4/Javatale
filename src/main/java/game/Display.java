@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import static game.Game.hp;
+
 public class Display extends JComponent {
 	public static Graphics2D graphics2D = null;
 	boolean pressed = false;
@@ -41,7 +43,7 @@ public class Display extends JComponent {
 			for (char c : "chara".toCharArray())
 				xC += Game.font.draw(c, -225 + (int) xC, 253, g2d) + 2f;
 			
-			for (char c : "lv 20".toCharArray())
+			for (char c : ("lv "+Game.lvl).toCharArray())
 				xC += Game.font.draw(c, -205 + (int) xC, 253, g2d) + 2f;
 			
 			AffineTransform defaultTransform = g2d.getTransform();
@@ -168,6 +170,17 @@ public class Display extends JComponent {
 				x += 116;
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
+			}
+			
+			int maxHealth = Game.healths[Game.lvl-1];
+			Game.hp = 91;
+			for (int i=0;i<maxHealth;i++) {
+//				float pct = i/(float)maxHealth;
+				float width = 0.92f;
+				float point = i*width;
+				if (i < hp) g2d.setColor(new Color(255,255,0));
+				else g2d.setColor(new Color(255,0,0));
+				g2d.fillRect(-40+(int)point,258,(int)Math.round(width),16);
 			}
 			
 			graphics2D = null;

@@ -1,22 +1,17 @@
 package game;
 
-import com.tfc.utils.Files;
-import game.langs.Python;
-import org.python.core.PyCode;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	//Game variables
@@ -30,6 +25,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static boolean inMenu = false;
 	public static int menuItem = 0;
 	public static final FontRenderer font;
+	public static final int[] healths = new int[20];
 	
 	static {
 		try {
@@ -59,6 +55,9 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static boolean onFloor = false;
 	public static int jumpTime = 0;
 	public static int soulType = 0;
+	public static int lvl = 20;
+	public static int hp = 20;
+	public static int invul = 0;
 	
 	//Battle memory (because python interpreter is being wacky)
 	//Need to make my own python interpreter at some point
@@ -83,6 +82,10 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		);
 		gameFrame.setResizable(false);
 		gameFrame.add(disp);
+		String healthsText = "20\n24\n28\n32\n36\n40\n44\n48\n52\n56\n60\n64\n68\n72\n76\n80\n84\n88\n92\n99\n";
+		String[] vals = healthsText.split("\n");
+		for (int i = 0; i < 20; i++) healths[i] = Integer.parseInt(vals[i].replace("\n", ""));
+		hp = healths[lvl-1];
 		try {
 			InputStream soulStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
 			InputStream iconStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/icon.png");
@@ -274,5 +277,9 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+	
+	public static float lerp(float pct, float start, float end) {
+		return ((start * (pct)) + (end * (1 - pct)));
 	}
 }
