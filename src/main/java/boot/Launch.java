@@ -37,6 +37,7 @@ public class Launch {
 							new File(Files.dir + "\\Javatale.jar"),
 							new File(Files.dir + "\\src\\main\\js"),
 							new File(Files.dir + "\\build\\classes\\java\\main"),
+							new File(Files.dir + "\\build\\classes\\resources"),
 							new File(Files.dir)
 					)
 			);

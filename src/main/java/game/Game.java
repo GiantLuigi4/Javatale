@@ -5,6 +5,7 @@ import game.langs.Python;
 import org.python.core.PyCode;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +21,9 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static int mouseY = 0;
 	public static boolean isLeftDown = false;
 	public static String battleName = "";
+	public static boolean inAttack = false;
+	public static boolean inMenu = false;
+	public static int menuItem = 0;
 	
 	//Board variables
 	public static double boardWidth = 649 / 2f;
@@ -49,11 +53,20 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static final String dir = System.getProperty("user.dir");
 	
 	//Display
-	public static JFrame gameFrame = new JFrame("Game");
+	public static JFrame gameFrame = new JFrame("Javatale");
 	public static final Display disp = new Display();
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		gameFrame.setSize(248 * 2, 200 * 2);
+//		gameFrame.setSize(248 * 2, 200 * 2);
+		int width = 656;
+		int height = 515;
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		gameFrame.setSize(width, height);
+		gameFrame.setLocation(
+				tk.getScreenSize().width/2-(width/2),
+				tk.getScreenSize().height/2-(height/2)+1
+		);
+		gameFrame.setResizable(false);
 		gameFrame.add(disp);
 		Game listeners = new Game();
 		gameFrame.addKeyListener(listeners);
@@ -84,6 +97,9 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			}
 			
 			handleControls(soulType);
+			
+			if (menuItem < 0) menuItem = 3;
+			else if (menuItem > 3) menuItem = 0;
 			
 			//Min and max didn't work, so I have to use this
 			if (playerX < (boardX + 6) - Math.abs((boardWidth / 2))) playerX = (boardX + 6) - Math.abs((boardWidth / 2));

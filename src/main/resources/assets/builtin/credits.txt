@@ -1,0 +1,3 @@
+idk how to navigate the ut assets, so here's how I got these.
+
+https://github.com/RhenaudTheLukark/CreateYourFrisk/tree/master/Assets/Default/Sprites

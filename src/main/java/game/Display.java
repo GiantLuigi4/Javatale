@@ -4,11 +4,15 @@ import com.tfc.utils.Files;
 import game.langs.Python;
 import org.python.core.PyCode;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class Display extends JComponent {
 	public static Graphics2D graphics2D = null;
@@ -42,12 +46,12 @@ public class Display extends JComponent {
 			
 			g2d.setTransform(defaultTransform);
 			
-			try {
-				PyCode code = Python.open(new File(Game.dir + "\\battles\\test\\draw.py"));
-				Python.exec(code);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				PyCode code = Python.open(new File(Game.dir + "\\battles\\test\\draw.py"));
+//				Python.exec(code);
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
 			
 			switch (Game.soulType) {
 				case 0:
@@ -62,7 +66,101 @@ public class Display extends JComponent {
 			}
 			
 			g2d.translate(Game.playerX, Game.playerY);
-			g2d.fillRect(-5, -5, 10, 10);
+			try {
+				InputStream soul = Display.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
+				assert soul != null;
+				BufferedImage image = ImageIO.read(soul);
+				int rgb = 0;
+				for (int x = 0; x < image.getWidth(); x++) {
+					for (int y = 0; y < image.getHeight(); y++) {
+						if (x == 0 && y == 0) {
+							rgb = image.getRGB(x, y);
+						}
+						if (image.getRGB(x, y) != rgb) {
+							image.setRGB(x, y, g2d.getColor().getRGB());
+						}
+					}
+				}
+				g2d.drawImage(
+						image,
+						-5, -5,
+						10, 10,
+						null
+				);
+				soul.close();
+			} catch (Throwable err) {
+				g2d.fillRect(-5, -5, 10, 10);
+			}
+			
+			g2d.setTransform(defaultTransform);
+			
+			int x = -224;
+			try {
+				InputStream fight = Display.class.getClassLoader().getResourceAsStream("assets/builtin/fightbt_norm.png");
+				assert fight != null;
+				BufferedImage image = ImageIO.read(fight);
+				g2d.drawImage(
+						image,
+						x, 282,
+						83, 33,
+						null
+				);
+				fight.close();
+				x+=116;
+			} catch (Throwable err) {
+				g2d.fillRect(-5, -5, 10, 10);
+			}
+			
+			try {
+				InputStream act = Display.class.getClassLoader().getResourceAsStream("assets/builtin/actbt_norm.png");
+				assert act != null;
+				BufferedImage image = ImageIO.read(act);
+				g2d.drawImage(
+						image,
+						//-108
+						x, 282,
+						83, 33,
+						null
+				);
+				act.close();
+				x+=121;
+			} catch (Throwable err) {
+				g2d.fillRect(-5, -5, 10, 10);
+			}
+			
+			try {
+				InputStream item = Display.class.getClassLoader().getResourceAsStream("assets/builtin/itembt_norm.png");
+				assert item != null;
+				BufferedImage image = ImageIO.read(item);
+				g2d.drawImage(
+						image,
+						//-108
+						x, 282,
+						83, 33,
+						null
+				);
+				item.close();
+				x+=117;
+			} catch (Throwable err) {
+				g2d.fillRect(-5, -5, 10, 10);
+			}
+			
+			try {
+				InputStream item = Display.class.getClassLoader().getResourceAsStream("assets/builtin/mercybt_norm.png");
+				assert item != null;
+				BufferedImage image = ImageIO.read(item);
+				g2d.drawImage(
+						image,
+						//-108
+						x, 282,
+						83, 33,
+						null
+				);
+				item.close();
+				x+=116;
+			} catch (Throwable err) {
+				g2d.fillRect(-5, -5, 10, 10);
+			}
 			
 			graphics2D = null;
 		} else {
