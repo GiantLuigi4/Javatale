@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -18,7 +19,7 @@ public class Projectile {
 	public double width = 16;
 	public double height = 16;
 	public int damage = 1;
-	public int invulTime = 20;
+	public int invulTime = 100;
 	public String resource = "assets/builtin/default_proj.png";
 	public final Consumer<Projectile> motion;
 	public final Consumer<Projectile> render;
@@ -79,12 +80,12 @@ public class Projectile {
 		motion.accept(this);
 		framesExisted++;
 		if (
-				(x - (width / 2f)) <= Game.playerX &&
-						(x + (width / 2f)) >= Game.playerX
+				(x - (width / 2f)) <= Game.playerX + 6 &&
+						(x + (width / 2f)) >= Game.playerX - 6
 		) {
 			if (
-					(y - (height / 2f)) <= Game.playerX &&
-							(y + (height / 2f)) >= Game.playerX
+					(y - (height / 2f)) <= Game.playerY + 6 &&
+							(y + (height / 2f)) >= Game.playerY - 6
 			) {
 				if (Game.invul <= 0) {
 					Game.hp -= damage;
@@ -104,5 +105,25 @@ public class Projectile {
 				(int) (this.y - (this.height / 2)),
 				null
 		);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Projectile that = (Projectile) o;
+		return framesExisted == that.framesExisted &&
+				Double.compare(that.x, x) == 0 &&
+				Double.compare(that.y, y) == 0 &&
+				Double.compare(that.width, width) == 0 &&
+				Double.compare(that.height, height) == 0 &&
+				damage == that.damage &&
+				invulTime == that.invulTime &&
+				Objects.equals(resource, that.resource);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(framesExisted, x, y, width, height, damage, invulTime, resource);
 	}
 }

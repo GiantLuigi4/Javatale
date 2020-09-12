@@ -219,7 +219,8 @@ public class Display extends JComponent {
 				g2d.setTransform(old);
 			}
 			
-			for (Projectile proj : Game.projectiles) {
+			for (int i = 0; i < Game.projectiles.size(); i++) {
+				Projectile proj = Game.projectiles.get(i);
 				try {
 					proj.render(g2d);
 				} catch (IOException e) {

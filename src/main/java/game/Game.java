@@ -145,18 +145,20 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			if (inAttack) {
 				handleControls(soulType);
 				//Min and max didn't work, so I have to use this
-				if (playerX < (boardX + 6) - Math.abs((boardWidth / 2)))
-					playerX = (boardX + 6) - Math.abs((boardWidth / 2));
-				if (playerX > (boardX - 6) + Math.abs((boardWidth / 2)))
-					playerX = (boardX - 6) + Math.abs((boardWidth / 2));
-				if (playerY < (boardY + 6) - Math.abs((boardHeight / 2)))
-					playerY = (boardY + 6) - Math.abs((boardHeight / 2));
-				if (playerY > (boardY - 6) + Math.abs((boardHeight / 2))) {
-					playerY = (boardY - 6) + Math.abs((boardHeight / 2));
+				if (playerX < (boardX + 7) - Math.abs((boardWidth / 2)))
+					playerX = (boardX + 7) - Math.abs((boardWidth / 2));
+				if (playerX > (boardX - 7) + Math.abs((boardWidth / 2)))
+					playerX = (boardX - 7) + Math.abs((boardWidth / 2));
+				if (playerY < (boardY + 8) - Math.abs((boardHeight / 2)))
+					playerY = (boardY + 8) - Math.abs((boardHeight / 2));
+				if (playerY > (boardY - 8) + Math.abs((boardHeight / 2))) {
+					playerY = (boardY - 8) + Math.abs((boardHeight / 2));
 					playerVelocY = 0;
 					onFloor = true;
 					jumpTime = 0;
 				}
+				invul--;
+				if (invul <= 0) invul = 0;
 			} else {
 				if (keysCodes.contains(KeyEvent.VK_LEFT)) {
 					menuItem -= 1;
@@ -187,6 +189,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 					playerX = boardX;
 					playerY = boardY;
 				}
+				invul = 0;
 //				System.out.println((99-20f)/20);
 			}
 		}
