@@ -70,7 +70,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static JFrame gameFrame = new JFrame("Javatale");
 	public static final Display disp = new Display();
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 //		gameFrame.setSize(248 * 2, 200 * 2);
 		int width = 656;
 		int height = 515;
@@ -174,6 +174,11 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 				int width = 429;
 				boardX = (442 / 2f - 13) - (width / 2f);
 				boardWidth = width;
+				if (keysCodes.contains(KeyEvent.VK_ENTER)) {
+					inAttack = true;
+					playerX = boardX;
+					playerY = boardY;
+				}
 //				System.out.println((99-20f)/20);
 			}
 		}
