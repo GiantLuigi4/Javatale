@@ -75,9 +75,12 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		if (inGame) {
 			//Call the battle's main function
 			try {
-				PyCode code = Python.open(new File(Files.dir + "\\battles\\"+battleName+"\\main.py"));
-				Python.exec(code);
+//				System.out.println(Game.class.getClassLoader().getResource("example/Main.class"));
+				Class.forName("battles."+battleName+".Main").getMethod("main", int.class).invoke(null, frame);
+//				PyCode code = Python.open(new File(Files.dir + "\\battles\\"+battleName+"\\main.py"));
+//				Python.exec(code);
 			} catch (Throwable ignored) {
+				ignored.printStackTrace();
 			}
 			
 			handleControls(soulType);
@@ -96,7 +99,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		
 		disp.repaint();
 		try {
-			while (time.getTime() > new Date().getTime() + 100);
+			while (time.getTime() - new Date().getTime() > -10);
 		} catch (Throwable ignored) {
 		}
 	}
@@ -106,13 +109,13 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			case 0:
 				//Default controls
 				if (keys.contains('a'))
-					playerX -= 0.5;
+					playerX -= 1;
 				if (keys.contains('d'))
-					playerX += 0.5;
+					playerX += 1;
 				if (keys.contains('w'))
-					playerY -= 0.5;
+					playerY -= 1;
 				if (keys.contains('s'))
-					playerY += 0.5;
+					playerY += 1;
 				break;
 			case 1:
 				//Blue controls

@@ -14,6 +14,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Launch {
 	private static final GroovyFlameClassLoader loader;
@@ -22,18 +24,28 @@ public class Launch {
 	static {
 		FlameConfig.field = new FlameLog();
 		try {
-//			if (new File(Files.dir+"\\Javatale.jar").exists()) {
-//				loader = new GroovyClassFlameLoader("Javatale.jar");
-//			} else {
-//				loader = new GroovyClassFlameLoader("src\\main\\java");
-//				loader.addDep(new File("src\\main\\python"));
-//			}
-//			loader.addDep(new File(Files.dir));
-//			dependencyManager = new Manager(loader);
+			ArrayList<File> allBattles = new ArrayList<>();
+			File[] files = new File(Files.dir+"\\battles").listFiles();
+			for (File f:files) {
+				if (f.isDirectory())
+					for (File f1:f.listFiles())
+						if (f1.getName().endsWith(".jar") || f1.getName().endsWith(".zip") || f1.isDirectory())
+							allBattles.add(f1);
+			}
+			allBattles.addAll(
+					Arrays.asList(
+							new File(Files.dir + "\\Javatale.jar"),
+							new File(Files.dir + "\\src\\main\\js"),
+							new File(Files.dir + "\\build\\classes\\java\\main"),
+							new File(Files.dir)
+					)
+			);
 			dependencyManager = Manager.constructFromDependencies(GroovyFlameClassLoader.class,
 					"libs/jython.zip,https://repo1.maven.org/maven2/org/python/jython/2.7.0/jython-2.7.0.jar," +
 							"libs/scala.zip,https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.12/scala-library-2.11.12.jar," +
 							"libs/lua.zip,https://repo1.maven.org/maven2/org/luaj/luaj-jse/3.0.1/luaj-jse-3.0.1.jar," +
+							"libs/kotlinx-debug.zip,https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-debug/1.3.9/kotlinx-coroutines-debug-1.3.9.jar," +
+							"libs/kotlinx-core.zip,https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.3.9/kotlinx-coroutines-core-1.3.9.jar," +
 							genGroovyDep("json") +
 							genGroovyDep("jmx") +
 							genGroovyDep("groovysh") +
@@ -52,12 +64,7 @@ public class Launch {
 							genKTDep("stdlib-jdk8") +
 							"libs/java_script.zip,https://plugins.gradle.org/m2/com/moowork/gradle/gradle-node-plugin/1.3.1/gradle-node-plugin-1.3.1.jar,",
 					"",
-					new File[]{
-							new File(Files.dir + "\\Javatale.jar"),
-							new File(Files.dir + "\\src\\main\\js"),
-							new File(Files.dir + "\\build\\classes\\java\\main"),
-							new File(Files.dir),
-					}
+					allBattles.toArray(new File[allBattles.size()])
 			);
 			loader = (GroovyFlameClassLoader) dependencyManager.getLoader();
 			File f = new File(Files.dir + "\\battles\\callHelper.py");
