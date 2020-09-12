@@ -4,11 +4,16 @@ import com.tfc.utils.Files;
 import game.langs.Python;
 import org.python.core.PyCode;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +29,15 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static boolean inAttack = false;
 	public static boolean inMenu = false;
 	public static int menuItem = 0;
+	public static final FontRenderer font;
+	
+	static {
+		try {
+			font = new FontRenderer("assets/builtin/uibattlesmall.png");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	//Board variables
 	public static double boardWidth = 649 / 2f;
@@ -44,9 +58,10 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static double playerVelocY = 0;
 	public static boolean onFloor = false;
 	public static int jumpTime = 0;
-	public static int soulType = 1;
+	public static int soulType = 0;
 	
 	//Battle memory (because python interpreter is being wacky)
+	//Need to make my own python interpreter at some point
 	public static HashMap<String, Object> memory = new HashMap<>();
 	
 	//Executing directory
@@ -56,18 +71,35 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static JFrame gameFrame = new JFrame("Javatale");
 	public static final Display disp = new Display();
 	
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 //		gameFrame.setSize(248 * 2, 200 * 2);
 		int width = 656;
 		int height = 515;
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		gameFrame.setSize(width, height);
 		gameFrame.setLocation(
-				tk.getScreenSize().width/2-(width/2),
-				tk.getScreenSize().height/2-(height/2)+1
+				tk.getScreenSize().width / 2 - (width / 2),
+				tk.getScreenSize().height / 2 - (height / 2) + 1
 		);
 		gameFrame.setResizable(false);
 		gameFrame.add(disp);
+		try {
+			InputStream soulStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
+			InputStream iconStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/icon.png");
+			assert soulStream != null;
+			BufferedImage soul = ImageIO.read(soulStream);
+			assert iconStream != null;
+			BufferedImage icon = ImageIO.read(iconStream);
+			Display.colorSoul(soul, new Color(255, 0, 0));
+			BufferedImage disp = new BufferedImage(soul.getWidth(), soul.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2d = (Graphics2D) disp.getGraphics();
+			g2d.drawImage(soul, 0, 0, null);
+			g2d.translate(8, 8);
+			g2d.scale(0.5f, 0.5f);
+			g2d.drawImage(icon, 0, 0, null);
+			gameFrame.setIconImage(disp);
+		} catch (Throwable ignored) {
+		}
 		Game listeners = new Game();
 		gameFrame.addKeyListener(listeners);
 		gameFrame.addMouseMotionListener(listeners);
@@ -89,33 +121,63 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			//Call the battle's main function
 			try {
 //				System.out.println(Game.class.getClassLoader().getResource("example/Main.class"));
-				Class.forName("battles."+battleName+".Main").getMethod("main", int.class).invoke(null, frame);
+				Class.forName("battles." + battleName + ".Main").getMethod("main", int.class).invoke(null, frame);
 //				PyCode code = Python.open(new File(Files.dir + "\\battles\\"+battleName+"\\main.py"));
 //				Python.exec(code);
 			} catch (Throwable ignored) {
 				ignored.printStackTrace();
 			}
 			
-			handleControls(soulType);
-			
 			if (menuItem < 0) menuItem = 3;
 			else if (menuItem > 3) menuItem = 0;
 			
-			//Min and max didn't work, so I have to use this
-			if (playerX < (boardX + 6) - Math.abs((boardWidth / 2))) playerX = (boardX + 6) - Math.abs((boardWidth / 2));
-			if (playerX > (boardX - 6) + Math.abs((boardWidth / 2))) playerX = (boardX - 6) + Math.abs((boardWidth / 2));
-			if (playerY < (boardY + 6) - Math.abs((boardHeight / 2))) playerY = (boardY + 6) - Math.abs((boardHeight / 2));
-			if (playerY > (boardY - 6) + Math.abs((boardHeight / 2))) {
-				playerY = (boardY - 6) + Math.abs((boardHeight / 2));
-				playerVelocY = 0;
-				onFloor = true;
-				jumpTime = 0;
+			if (inAttack) {
+				handleControls(soulType);
+				//Min and max didn't work, so I have to use this
+				if (playerX < (boardX + 6) - Math.abs((boardWidth / 2)))
+					playerX = (boardX + 6) - Math.abs((boardWidth / 2));
+				if (playerX > (boardX - 6) + Math.abs((boardWidth / 2)))
+					playerX = (boardX - 6) + Math.abs((boardWidth / 2));
+				if (playerY < (boardY + 6) - Math.abs((boardHeight / 2)))
+					playerY = (boardY + 6) - Math.abs((boardHeight / 2));
+				if (playerY > (boardY - 6) + Math.abs((boardHeight / 2))) {
+					playerY = (boardY - 6) + Math.abs((boardHeight / 2));
+					playerVelocY = 0;
+					onFloor = true;
+					jumpTime = 0;
+				}
+			} else {
+				if (keysCodes.contains(KeyEvent.VK_LEFT)) {
+					menuItem -= 1;
+					keysCodes.remove((Integer) KeyEvent.VK_LEFT);
+				} else if (keysCodes.contains(KeyEvent.VK_RIGHT)) {
+					menuItem += 1;
+					keysCodes.remove((Integer) KeyEvent.VK_RIGHT);
+				}
+				if (menuItem == 0)
+					playerX = -212;
+				else if (menuItem == 1)
+					playerX = -166 + 70;
+				else if (menuItem == 2)
+					playerX = -45 + 70;
+				else if (menuItem == 3)
+					playerX = 72 + 70;
+				playerY = 282 + 17;
+				boardWidth = 442;
+				boardX = 0;
+				int height = 102;
+				boardY = (246) - (height / 2f);
+				boardHeight = height;
+				int width = 429;
+				boardX = (442 / 2f - 13) - (width / 2f);
+				boardWidth = width;
+//				System.out.println((99-20f)/20);
 			}
 		}
 		
 		disp.repaint();
 		try {
-			while (time.getTime() - new Date().getTime() > -10);
+			while (time.getTime() - new Date().getTime() > -10) ;
 		} catch (Throwable ignored) {
 		}
 	}
@@ -124,54 +186,61 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		switch (soulType) {
 			case 0:
 				//Default controls
-				if (keys.contains('a'))
+				if (keysCodes.contains(KeyEvent.VK_LEFT))
 					playerX -= 1;
-				if (keys.contains('d'))
+				if (keysCodes.contains(KeyEvent.VK_RIGHT))
 					playerX += 1;
-				if (keys.contains('w'))
+				if (keysCodes.contains(KeyEvent.VK_UP))
 					playerY -= 1;
-				if (keys.contains('s'))
+				if (keysCodes.contains(KeyEvent.VK_DOWN))
 					playerY += 1;
 				break;
 			case 1:
 				//Blue controls
-				if (keys.contains('a'))
+				if (keysCodes.contains(KeyEvent.VK_LEFT))
 					playerX -= 1;
-				if (keys.contains('d'))
+				if (keysCodes.contains(KeyEvent.VK_RIGHT))
 					playerX += 1;
-				if (jumpTime <= 150/5 && keys.contains('w')) {
+				if (jumpTime <= 150 / 5 && keysCodes.contains(KeyEvent.VK_UP)) {
 					playerVelocY = -0.25 * 5;
 					jumpTime++;
 				} else {
 					jumpTime = 1000000;
 					playerVelocY += 0.05;
 				}
-				if (keys.contains('s')) {
+				if (keysCodes.contains(KeyEvent.VK_DOWN))
 					playerVelocY = 0.5;
-				}
 				playerY += playerVelocY;
 				break;
 		}
 	}
 	
+	//Inputs
 	public static final ArrayList<Character> keys = new ArrayList<>();
+	public static final ArrayList<Integer> keysCodes = new ArrayList<>();
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
 		if (!keys.contains(e.getKeyChar()))
 			keys.add(e.getKeyChar());
+		if (!keysCodes.contains(e.getKeyCode()))
+			keysCodes.add(e.getKeyCode());
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (!keys.contains(e.getKeyChar()))
 			keys.add(e.getKeyChar());
+		if (!keysCodes.contains(e.getKeyCode()))
+			keysCodes.add(e.getKeyCode());
 	}
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (keys.contains(e.getKeyChar()))
 			keys.remove((Character) e.getKeyChar());
+		if (keysCodes.contains(e.getKeyCode()))
+			keysCodes.remove((Integer) e.getKeyCode());
 	}
 	
 	@Override

@@ -9,6 +9,11 @@ import com.tfc.utils.groovy.flame.GroovyFlameClassLoader;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyResourceLoader;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,10 +30,10 @@ public class Launch {
 		FlameConfig.field = new FlameLog();
 		try {
 			ArrayList<File> allBattles = new ArrayList<>();
-			File[] files = new File(Files.dir+"\\battles").listFiles();
-			for (File f:files) {
+			File[] files = new File(Files.dir + "\\battles").listFiles();
+			for (File f : files) {
 				if (f.isDirectory())
-					for (File f1:f.listFiles())
+					for (File f1 : f.listFiles())
 						if (f1.getName().endsWith(".jar") || f1.getName().endsWith(".zip") || f1.isDirectory())
 							allBattles.add(f1);
 			}
@@ -82,6 +87,15 @@ public class Launch {
 	}
 	
 	public static void main(String[] args) throws Exception {
+//		Icon ico = FileSystemView.getFileSystemView().getSystemIcon(new File(Files.dir+"\\Javatale.jar"));
+//		File out = new File(Files.dir+"\\Javatale.png");
+//		System.out.println(out.toString());
+//		out.createNewFile();
+//		BufferedImage image = new BufferedImage(ico.getIconWidth(),ico.getIconHeight(),BufferedImage.TYPE_INT_RGB);
+//		Graphics2D g2d = (Graphics2D)image.getGraphics();
+//		g2d.scale(1,1);
+//		ico.paintIcon(null,g2d,0,0);
+//		ImageIO.write(image, "png", out);
 		loader.load("game.Game").getMethod("main", String[].class).invoke(null, (Object) args);
 	}
 	

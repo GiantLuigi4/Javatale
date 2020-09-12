@@ -1,3 +1,5 @@
-idk how to navigate the ut assets, so here's how I got these.
-
+idk how to navigate the ut assets, so here's how I got these:
 https://github.com/RhenaudTheLukark/CreateYourFrisk/tree/master/Assets/Default/Sprites
+
+font credit to:
+https://fontstruct.com/fontstructions/show/1277428/undertale-in-game-hud-font
