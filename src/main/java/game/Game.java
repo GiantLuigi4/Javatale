@@ -1,5 +1,7 @@
 package game;
 
+import game.utils.Projectile;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -40,6 +42,9 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static double boardHeight = 385 / 2f;
 	public static double boardX = 0;
 	public static double boardY = 180;
+	
+	//Attack variables
+	public static ArrayList<Projectile> projectiles = new ArrayList<>();
 	
 	//Display variables
 	public static double globalRotation = 0;
@@ -85,7 +90,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		String healthsText = "20\n24\n28\n32\n36\n40\n44\n48\n52\n56\n60\n64\n68\n72\n76\n80\n84\n88\n92\n99\n";
 		String[] vals = healthsText.split("\n");
 		for (int i = 0; i < 20; i++) healths[i] = Integer.parseInt(vals[i].replace("\n", ""));
-		hp = healths[lvl-1];
+		hp = healths[lvl - 1];
 		try {
 			InputStream soulStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
 			InputStream iconStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/icon.png");
@@ -94,8 +99,9 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			assert iconStream != null;
 			BufferedImage icon = ImageIO.read(iconStream);
 			Display.colorSoul(soul, new Color(255, 0, 0));
-			BufferedImage disp = new BufferedImage(soul.getWidth(), soul.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			BufferedImage disp = new BufferedImage(soul.getWidth() * 2, soul.getHeight() * 2, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2d = (Graphics2D) disp.getGraphics();
+			g2d.scale(2, 2);
 			g2d.drawImage(soul, 0, 0, null);
 			g2d.translate(8, 8);
 			g2d.scale(0.5f, 0.5f);
@@ -130,6 +136,8 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			} catch (Throwable ignored) {
 				ignored.printStackTrace();
 			}
+			
+			for (Projectile proj : projectiles) proj.update();
 			
 			if (menuItem < 0) menuItem = 3;
 			else if (menuItem > 3) menuItem = 0;
@@ -191,17 +199,18 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	}
 	
 	public static void handleControls(int soulType) {
+		float speed = 0.75f;
 		switch (soulType) {
 			case 0:
 				//Default controls
 				if (keysCodes.contains(KeyEvent.VK_LEFT))
-					playerX -= 1;
+					playerX -= speed;
 				if (keysCodes.contains(KeyEvent.VK_RIGHT))
-					playerX += 1;
+					playerX += speed;
 				if (keysCodes.contains(KeyEvent.VK_UP))
-					playerY -= 1;
+					playerY -= speed;
 				if (keysCodes.contains(KeyEvent.VK_DOWN))
-					playerY += 1;
+					playerY += speed;
 				break;
 			case 1:
 				//Blue controls

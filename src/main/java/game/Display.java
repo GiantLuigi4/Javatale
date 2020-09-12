@@ -2,6 +2,7 @@ package game;
 
 import com.tfc.utils.Files;
 import game.langs.Python;
+import game.utils.Projectile;
 import org.python.core.PyCode;
 
 import javax.imageio.ImageIO;
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import static game.Game.hp;
@@ -43,7 +45,7 @@ public class Display extends JComponent {
 			for (char c : "chara".toCharArray())
 				xC += Game.font.draw(c, -225 + (int) xC, 253, g2d) + 2f;
 			
-			for (char c : ("lv "+Game.lvl).toCharArray())
+			for (char c : ("lv " + Game.lvl).toCharArray())
 				xC += Game.font.draw(c, -205 + (int) xC, 253, g2d) + 2f;
 			
 			AffineTransform defaultTransform = g2d.getTransform();
@@ -55,13 +57,13 @@ public class Display extends JComponent {
 			g2d.fillRect((int) (-(Game.boardWidth / 2) + 1), (int) ((-Game.boardHeight / 2) + 1), (int) Game.boardWidth - 2, (int) Game.boardHeight - 2);
 			
 			g2d.setTransform(defaultTransform);
-
-//			try {
+			
+			try {
 //				PyCode code = Python.open(new File(Game.dir + "\\battles\\test\\draw.py"));
 //				Python.exec(code);
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
 			
 			switch (Game.soulType) {
 				case 0:
@@ -80,7 +82,9 @@ public class Display extends JComponent {
 				InputStream soul = Display.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
 				assert soul != null;
 				BufferedImage image = ImageIO.read(soul);
-				colorSoul(image, g2d.getColor());
+				Color c = g2d.getColor();
+				Color recolored = new Color(c.getRed(), c.getBlue(), c.getGreen(), Game.invul >= 1 ? 128 : 255);
+				colorSoul(image, recolored);
 				int size = 12;
 				g2d.drawImage(
 						image,
@@ -172,15 +176,14 @@ public class Display extends JComponent {
 				g2d.fillRect(-5, -5, 10, 10);
 			}
 			
-			int maxHealth = Game.healths[Game.lvl-1];
-			Game.hp = 91;
-			for (int i=0;i<maxHealth;i++) {
-//				float pct = i/(float)maxHealth;
+			int maxHealth = Game.healths[Game.lvl - 1];
+			for (int i = 0; i < maxHealth; i++) {
 				float width = 0.92f;
-				float point = i*width;
-				if (i < hp) g2d.setColor(new Color(255,255,0));
-				else g2d.setColor(new Color(255,0,0));
-				g2d.fillRect(-40+(int)point,258,(int)Math.round(width),16);
+				float point = i * width;
+				if (i < hp) g2d.setColor(new Color(255, 255, 0));
+				else g2d.setColor(new Color(255, 0, 0));
+				g2d.fillRect(-40 + (int) point, 258, (int) Math.round(width), 16);
+				x = -40 + (int) point;
 			}
 			
 			try {
@@ -189,18 +192,39 @@ public class Display extends JComponent {
 				BufferedImage image = ImageIO.read(hp);
 				float scale = 0.8f;
 				AffineTransform old = g2d.getTransform();
-				g2d.translate(-63.5f,261.5f);
-				g2d.scale(0.95f,1f);
+				g2d.translate(-63.5f, 261.5f);
+				g2d.scale(0.95f, 1f);
 				g2d.drawImage(
 						image,
 						0, 0,
-						(int)(23*scale), (int)(10*scale),
+						(int) (23 * scale), (int) (10 * scale),
 						null
 				);
 				g2d.setTransform(old);
 				hp.close();
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
+			}
+			
+			String text = Game.hp + " / " + maxHealth;
+			AffineTransform old = g2d.getTransform();
+			float x1 = x;
+			for (char c : text.toCharArray()) {
+				g2d.translate(x1 + 12, 253);
+				float scale = 0.975f;
+				g2d.scale(scale, 1);
+				g2d.translate(-1, 0);
+				g2d.scale(1f / scale, 1);
+				x1 += Game.font.draw(c, 0, 0, g2d) + 2.5f;
+				g2d.setTransform(old);
+			}
+			
+			for (Projectile proj : Game.projectiles) {
+				try {
+					proj.render(g2d);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			graphics2D = null;

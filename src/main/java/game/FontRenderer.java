@@ -252,6 +252,14 @@ public class FontRenderer {
 				ySize = (int) (25 / 1.6);
 				yOff = 4;
 				break;
+			case '/':
+				dx = 125;
+				sx = 5;
+				dy = 50;
+				sy = 10;
+				xOff = 2;
+				additionalWidth = 2;
+				break;
 		}
 		BufferedImage render = image.getSubimage(dx, dy, sx, sy);
 		g2d.drawImage(render, x + xOff, y + yOff, (int) (sx / 4f * (9 + additionalWidth)), ySize, null);
