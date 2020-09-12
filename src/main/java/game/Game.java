@@ -1,18 +1,25 @@
 package game;
 
+import com.tfc.utils.Files;
+import game.langs.Python;
 import org.python.core.PyCode;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
-public class Game implements KeyListener {
+public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	//Game variables
 	public static int frameNumber = 0;
+	public static boolean inGame = false;
+	public static int mouseX = 0;
+	public static int mouseY = 0;
+	public static boolean isLeftDown = false;
+	public static String battleName = "";
 	
 	//Board variables
 	public static double boardWidth = 649 / 2f;
@@ -48,36 +55,48 @@ public class Game implements KeyListener {
 	public static void main(String[] args) throws FileNotFoundException {
 		gameFrame.setSize(248 * 2, 200 * 2);
 		gameFrame.add(disp);
-		gameFrame.addKeyListener(new Game());
+		Game listeners = new Game();
+		gameFrame.addKeyListener(listeners);
+		gameFrame.addMouseMotionListener(listeners);
+		gameFrame.addMouseListener(listeners);
 		gameFrame.setVisible(true);
 		while (gameFrame.isVisible()) {
-			loop(frameNumber);
+			try {
+				loop(frameNumber);
+			} catch (Throwable ignored) {
+			}
 			frameNumber++;
 		}
 		Runtime.getRuntime().exit(0);
 	}
 	
 	public static void loop(int frame) throws FileNotFoundException {
-		//Call the battle's main function
-		PyCode code = Python.open(new File(dir + "\\battles\\test\\main.py"));
-		Python.exec(code);
-		
-		handleControls(soulType);
-		
-		//Min and max didn't work, so I have to use this
-		if (playerX < (boardX + 6) - Math.abs((boardWidth / 2))) playerX = (boardX + 6) - Math.abs((boardWidth / 2));
-		if (playerX > (boardX - 6) + Math.abs((boardWidth / 2))) playerX = (boardX - 6) + Math.abs((boardWidth / 2));
-		if (playerY < (boardY + 6) - Math.abs((boardHeight / 2))) playerY = (boardY + 6) - Math.abs((boardHeight / 2));
-		if (playerY > (boardY - 6) + Math.abs((boardHeight / 2))) {
-			playerY = (boardY - 6) + Math.abs((boardHeight / 2));
-			playerVelocY = 0;
-			onFloor = true;
-			jumpTime = 0;
+		Date time = new Date();
+		if (inGame) {
+			//Call the battle's main function
+			try {
+				PyCode code = Python.open(new File(Files.dir + "\\battles\\"+battleName+"\\main.py"));
+				Python.exec(code);
+			} catch (Throwable ignored) {
+			}
+			
+			handleControls(soulType);
+			
+			//Min and max didn't work, so I have to use this
+			if (playerX < (boardX + 6) - Math.abs((boardWidth / 2))) playerX = (boardX + 6) - Math.abs((boardWidth / 2));
+			if (playerX > (boardX - 6) + Math.abs((boardWidth / 2))) playerX = (boardX - 6) + Math.abs((boardWidth / 2));
+			if (playerY < (boardY + 6) - Math.abs((boardHeight / 2))) playerY = (boardY + 6) - Math.abs((boardHeight / 2));
+			if (playerY > (boardY - 6) + Math.abs((boardHeight / 2))) {
+				playerY = (boardY - 6) + Math.abs((boardHeight / 2));
+				playerVelocY = 0;
+				onFloor = true;
+				jumpTime = 0;
+			}
 		}
 		
 		disp.repaint();
 		try {
-			Thread.sleep(1);
+			while (time.getTime() > new Date().getTime() + 100);
 		} catch (Throwable ignored) {
 		}
 	}
@@ -87,26 +106,26 @@ public class Game implements KeyListener {
 			case 0:
 				//Default controls
 				if (keys.contains('a'))
-					playerX -= 0.1;
+					playerX -= 0.5;
 				if (keys.contains('d'))
-					playerX += 0.1;
+					playerX += 0.5;
 				if (keys.contains('w'))
-					playerY -= 0.1;
+					playerY -= 0.5;
 				if (keys.contains('s'))
-					playerY += 0.1;
+					playerY += 0.5;
 				break;
 			case 1:
 				//Blue controls
 				if (keys.contains('a'))
-					playerX -= 0.2;
+					playerX -= 1;
 				if (keys.contains('d'))
-					playerX += 0.2;
-				if (jumpTime <= 150 && keys.contains('w')) {
-					playerVelocY = -0.25;
+					playerX += 1;
+				if (jumpTime <= 150/5 && keys.contains('w')) {
+					playerVelocY = -0.25 * 5;
 					jumpTime++;
 				} else {
 					jumpTime = 1000000;
-					playerVelocY += 0.01;
+					playerVelocY += 0.05;
 				}
 				if (keys.contains('s')) {
 					playerVelocY = 0.5;
@@ -134,5 +153,38 @@ public class Game implements KeyListener {
 	public void keyReleased(KeyEvent e) {
 		if (keys.contains(e.getKeyChar()))
 			keys.remove((Character) e.getKeyChar());
+	}
+	
+	@Override
+	public void mouseDragged(MouseEvent e) {
+	}
+	
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		mouseX = e.getX();
+		mouseY = e.getY();
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+//		if (e.getButton() == 1) isLeftDown = true;
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (e.getButton() == 1) isLeftDown = true;
+	}
+	
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		if (e.getButton() == 1) isLeftDown = false;
+	}
+	
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	
+	@Override
+	public void mouseExited(MouseEvent e) {
 	}
 }

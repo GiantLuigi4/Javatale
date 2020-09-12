@@ -4,7 +4,7 @@ from java.lang import Math
 
 
 # this is called every Game.frame
-Game.soulType = 0
+Game.soulType = 1
 
 if not Game.memory.containsKey('bullet1'):
     Game.memory.put('bullet1X', 0)

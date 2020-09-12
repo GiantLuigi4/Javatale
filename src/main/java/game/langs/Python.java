@@ -1,5 +1,6 @@
-package game;
+package game.langs;
 
+import game.Game;
 import org.python.core.PyCode;
 import org.python.util.PythonInterpreter;
 
