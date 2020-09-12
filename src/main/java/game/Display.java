@@ -183,6 +183,26 @@ public class Display extends JComponent {
 				g2d.fillRect(-40+(int)point,258,(int)Math.round(width),16);
 			}
 			
+			try {
+				InputStream hp = Display.class.getClassLoader().getResourceAsStream("assets/builtin/HP.png");
+				assert hp != null;
+				BufferedImage image = ImageIO.read(hp);
+				float scale = 0.8f;
+				AffineTransform old = g2d.getTransform();
+				g2d.translate(-63.5f,261.5f);
+				g2d.scale(0.95f,1f);
+				g2d.drawImage(
+						image,
+						0, 0,
+						(int)(23*scale), (int)(10*scale),
+						null
+				);
+				g2d.setTransform(old);
+				hp.close();
+			} catch (Throwable err) {
+				g2d.fillRect(-5, -5, 10, 10);
+			}
+			
 			graphics2D = null;
 		} else {
 			int y = 5;
