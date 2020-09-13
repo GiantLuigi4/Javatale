@@ -1,8 +1,11 @@
 package battles.example;
 
+import assorted_projectiles.FireflyProjectile;
+//import assorted_projectiles.SnakeProjectile;
 import game.Game;
 import game.utils.Projectile;
 
+import java.awt.*;
 import java.util.Random;
 
 public class Main {
@@ -12,25 +15,66 @@ public class Main {
 	private static final Random rng = new Random();
 	private static boolean inAttack = false;
 	private static final int attackCount = 2;
+	private static float messageProgress = 0;
+	private static int attacksDone = 0;
+	private static int msgNum = 0;
+	private static final String[] messages = new String[]{
+			"Hello, welcome to the example battle.",
+			"This battle has a total of " + attackCount + "\nimplemented attacks.",
+			"It also has a total of " + 4 + " messages.",
+			"This is the last message, it will\nrandomly cycle through the messages from here"
+	};
 	
 	public static void main(int frame) {
 		Game.soulType = 0;
 		Game.globalOffsetX = 0;
 		Game.globalOffsetY = 0;
 		if (Game.inAttack) {
+			messageProgress = 0;
 			if (!inAttack)
 				attackNum = rng.nextDouble();
-//			attackNum = 1;
+//			attackNum = 1.5;
 			if (attackNum * attackCount <= 1)
 				attack1(frame);
 			else if (attackNum * attackCount <= 2)
 				attack2(frame);
-			else if (attackNum * attackCount <= 3)
-				attack3(frame);
+//			else if (attackNum * attackCount <= 3)
+//				attack3(frame);
 			else Game.inAttack = false;
 			inAttack = true;
 		} else {
+			if (inAttack) {
+				attacksDone++;
+				msgNum = attacksDone;
+				if (msgNum > messages.length)
+					msgNum = rng.nextInt(messages.length);
+			}
 			inAttack = false;
+		}
+	}
+	
+	public static void draw(Graphics2D g2d) {
+		if (!Game.inAttack && !Game.inMenu) {
+			messageProgress+=0.1f;
+			if (messageProgress > messages[msgNum].length()+3) {
+				messageProgress = messages[msgNum].length()+3;
+			}
+			int i = 0;
+			int x = -209;
+			int y = 156;
+			for (char c : ("*  " + messages[msgNum]).toLowerCase().toCharArray()) {
+				if (i <= messageProgress) {
+					x += Game.font.draw(c, x, y, g2d) + 2;
+				}
+				if (c == '\n') {
+					x = -186;
+					y += 16;
+				}
+				if (i >= 3 && c == ' ') {
+					x+=3;
+				}
+				i++;
+			}
 		}
 	}
 	
@@ -107,33 +151,33 @@ public class Main {
 		}
 	}
 	
-	private static void attack3(int frame) {
-		Game.soulType = 1;
-		Game.boardWidth = 600;
-		Game.boardHeight = 600;
-		Game.boardX = Game.playerX / 2f;
-		Game.boardY = Game.playerY / 2f;
-		Game.globalOffsetX = -Game.playerX;
-		Game.globalOffsetY = -Game.playerY + 120;
-		if (!inAttack) {
-			Projectile proj = null;
-			Projectile head = new SnakeProjectile(0, 0, (Proj) -> {
-			}, (Proj) -> {
-			}, null, null);
-			for (int i = 0; i < 63; i++) {
-				proj = new SnakeProjectile(0, 0, (Proj) -> {
-				}, (Proj) -> {
-				}, proj, head);
-				Game.projectiles.add(proj);
-			}
-			Game.projectiles.add(head);
-		}
-		num++;
-		if (num >=51000) {
-			Game.inAttack = false;
-			Game.projectiles.clear();
-			num2 = 0;
-			num = 0;
-		}
-	}
+//	private static void attack3(int frame) {
+//		Game.soulType = 1;
+//		Game.boardWidth = 600;
+//		Game.boardHeight = 600;
+//		Game.boardX = Game.playerX / 2f;
+//		Game.boardY = Game.playerY / 2f;
+//		Game.globalOffsetX = -Game.playerX;
+//		Game.globalOffsetY = -Game.playerY + 120;
+//		if (!inAttack) {
+//			Projectile proj = null;
+//			Projectile head = new SnakeProjectile(0, 250, (Proj) -> {
+//			}, (Proj) -> {
+//			}, null, null);
+//			for (int i = 0; i < 63; i++) {
+//				proj = new SnakeProjectile(0, 250 - i * 16, (Proj) -> {
+//				}, (Proj) -> {
+//				}, proj, head);
+//				Game.projectiles.add(proj);
+//			}
+//			Game.projectiles.add(head);
+//		}
+//		num++;
+//		if (num >= 7500) {
+//			Game.inAttack = false;
+//			Game.projectiles.clear();
+//			num2 = 0;
+//			num = 0;
+//		}
+//	}
 }

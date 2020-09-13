@@ -96,11 +96,8 @@ public class Projectile {
 	}
 	
 	public void render(Graphics2D g2d) throws IOException {
-		InputStream stream = Projectile.class.getClassLoader().getResourceAsStream(resource);
-		BufferedImage img = ImageIO.read(stream);
-		stream.close();
 		g2d.drawImage(
-				img,
+				AssetMap.getOrLoad(resource),
 				(int) (this.x - (this.width / 2)),
 				(int) (this.y - (this.height / 2)),
 				null

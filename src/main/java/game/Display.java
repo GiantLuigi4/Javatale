@@ -2,6 +2,7 @@ package game;
 
 import com.tfc.utils.Files;
 import game.langs.Python;
+import game.utils.AssetMap;
 import game.utils.Projectile;
 import org.python.core.PyCode;
 
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import static game.Game.hp;
 
@@ -59,10 +61,11 @@ public class Display extends JComponent {
 			g2d.setTransform(defaultTransform);
 			
 			try {
+				Class.forName("battles." + Game.battleName + ".Main").getMethod("draw", Graphics2D.class).invoke(null, g2d);
 //				PyCode code = Python.open(new File(Game.dir + "\\battles\\test\\draw.py"));
 //				Python.exec(code);
 			} catch (Throwable e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 			
 			switch (Game.soulType) {
@@ -79,9 +82,8 @@ public class Display extends JComponent {
 			
 			g2d.translate(Game.playerX, Game.playerY);
 			try {
-				InputStream soul = Display.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
-				assert soul != null;
-				BufferedImage image = ImageIO.read(soul);
+				String asset = "assets/builtin/soul.png";
+				BufferedImage image = AssetMap.getOrLoad(asset);
 				Color c = g2d.getColor();
 				Color recolored = new Color(c.getRed(), c.getGreen(), c.getBlue(), Game.invul >= 1 ? 128 : 255);
 				colorSoul(image, recolored);
@@ -92,7 +94,6 @@ public class Display extends JComponent {
 						size, size + 1,
 						null
 				);
-				soul.close();
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
 			}
@@ -101,76 +102,61 @@ public class Display extends JComponent {
 			
 			int x = -224;
 			try {
-				InputStream fight = null;
-				if (!Game.inAttack && Game.menuItem == 0)
-					fight = Display.class.getClassLoader().getResourceAsStream("assets/builtin/fightbt_select.png");
-				else fight = Display.class.getClassLoader().getResourceAsStream("assets/builtin/fightbt_norm.png");
-				assert fight != null;
-				BufferedImage image = ImageIO.read(fight);
+				String asset = "assets/builtin/fightbt_norm.png";
+				if (!Game.inAttack && Game.menuItem == 0 && !Game.inResponse) asset = "assets/builtin/fightbt_select.png";
+				BufferedImage image = AssetMap.getOrLoad(asset);
 				g2d.drawImage(
 						image,
 						x, 282,
 						83, 33,
 						null
 				);
-				fight.close();
 				x += 116;
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
 			}
 			
 			try {
-				InputStream act = null;
-				if (!Game.inAttack && Game.menuItem == 1)
-					act = Display.class.getClassLoader().getResourceAsStream("assets/builtin/actbt_select.png");
-				else act = Display.class.getClassLoader().getResourceAsStream("assets/builtin/actbt_norm.png");
-				assert act != null;
-				BufferedImage image = ImageIO.read(act);
+				String asset = "assets/builtin/actbt_norm.png";
+				if (!Game.inAttack && Game.menuItem == 1 && !Game.inResponse) asset = "assets/builtin/actbt_select.png";
+				BufferedImage image = AssetMap.getOrLoad(asset);
 				g2d.drawImage(
 						image,
 						x, 282,
 						83, 33,
 						null
 				);
-				act.close();
 				x += 121;
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
 			}
 			
 			try {
-				InputStream item = null;
-				if (!Game.inAttack && Game.menuItem == 2)
-					item = Display.class.getClassLoader().getResourceAsStream("assets/builtin/itembt_select.png");
-				else item = Display.class.getClassLoader().getResourceAsStream("assets/builtin/itembt_norm.png");
-				assert item != null;
-				BufferedImage image = ImageIO.read(item);
+				String asset = "assets/builtin/itembt_norm.png";
+				if (!Game.inAttack && Game.menuItem == 2 && !Game.inResponse) asset = "assets/builtin/itembt_select.png";
+				BufferedImage image = AssetMap.getOrLoad(asset);
 				g2d.drawImage(
 						image,
 						x, 282,
 						83, 33,
 						null
 				);
-				item.close();
 				x += 117;
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
 			}
 			
 			try {
-				InputStream mercy = null;
-				if (!Game.inAttack && Game.menuItem == 3)
-					mercy = Display.class.getClassLoader().getResourceAsStream("assets/builtin/mercybt_select.png");
-				else mercy = Display.class.getClassLoader().getResourceAsStream("assets/builtin/mercybt_norm.png");
-				assert mercy != null;
-				BufferedImage image = ImageIO.read(mercy);
+				String asset = "assets/builtin/mercybt_norm.png";
+				if (!Game.inAttack && Game.menuItem == 3 && !Game.inResponse) asset = "assets/builtin/mercybt_select.png";
+				BufferedImage image = AssetMap.getOrLoad(asset);
 				g2d.drawImage(
 						image,
 						x, 282,
 						83, 33,
 						null
 				);
-				mercy.close();
+//				mercy.close();
 				x += 116;
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
@@ -187,9 +173,7 @@ public class Display extends JComponent {
 			}
 			
 			try {
-				InputStream hp = Display.class.getClassLoader().getResourceAsStream("assets/builtin/HP.png");
-				assert hp != null;
-				BufferedImage image = ImageIO.read(hp);
+				BufferedImage image = AssetMap.getOrLoad("assets/builtin/HP.png");
 				float scale = 0.8f;
 				AffineTransform old = g2d.getTransform();
 				g2d.translate(-63.5f, 261.5f);
@@ -201,7 +185,7 @@ public class Display extends JComponent {
 						null
 				);
 				g2d.setTransform(old);
-				hp.close();
+//				hp.close();
 			} catch (Throwable err) {
 				g2d.fillRect(-5, -5, 10, 10);
 			}
@@ -229,11 +213,47 @@ public class Display extends JComponent {
 				}
 			}
 			
+			if (Game.inMenu && !Game.inResponse) {
+				try {
+					String menuType = "";
+					switch (Game.menuItem) {
+						case 0:
+							menuType = "fight";
+							break;
+						case 1:
+							menuType = "act";
+							break;
+						case 2:
+							menuType = "item";
+							break;
+						case 3:
+							menuType = "mercy";
+							break;
+					}
+					ArrayList<String> elements = new ArrayList<>();
+					Class.forName("battles." + Game.battleName + ".UI").getMethod("fillMenu", String.class, ArrayList.class).invoke(null, menuType, elements);
+					g2d.translate(0.5f,0.1f);
+					for (int i=0;i < elements.size(); i++) {
+						String element =elements.get(i);
+						int xPos = -197;
+						int yPos = 156;
+						if (i == 0) {
+							for (char c:(("      *  ") + element.toLowerCase()).toCharArray())
+								xPos += Game.font.draw(c, xPos, yPos, g2d) + 2;
+						}
+					}
+				} catch (Throwable ignored) {
+				}
+			}
+			
 			graphics2D = null;
 		} else {
 			int y = 5;
 			for (File f : new File(Files.dir + "\\battles").listFiles()) {
-				if (f.isDirectory()) {
+				if (f.isDirectory() || f.getName().endsWith(".zip") || f.getName().endsWith(".jar")) {
+					boolean isZipOrJar = f.getName().endsWith(".zip") || f.getName().endsWith(".jar");
+					String name = f.getName();
+					if (isZipOrJar) name = name.substring(0,name.length()-4);
 					if (Game.mouseY <= y + 60 && Game.mouseY >= y + 30)
 						if (Game.isLeftDown) {
 							g2d.setColor(new Color(128, 128, 128));
@@ -241,15 +261,15 @@ public class Display extends JComponent {
 						} else if (!pressed) {
 							g2d.setColor(new Color(192, 192, 192));
 						} else {
-							Game.battleName = f.getName();
+							Game.battleName = name;
 							Game.inGame = true;
 							pressed = false;
 						}
 					else g2d.setColor(new Color(255, 255, 255));
 					g2d.fillRect(0, y, 100000, 30);
 					g2d.setColor(new Color(0));
-					g2d.drawString(f.getName(), 10, y + 20);
-					g2d.drawString(f.getName(), 11, y + 21);
+					g2d.drawString(name, 10, y + 20);
+					g2d.drawString(name, 11, y + 21);
 					y += 35;
 				}
 			}

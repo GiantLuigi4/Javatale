@@ -26,8 +26,10 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static boolean inAttack = false;
 	public static boolean inMenu = false;
 	public static int menuItem = 0;
+	public static int menuElement = 0;
 	public static final FontRenderer font;
 	public static final int[] healths = new int[20];
+	public static boolean inResponse = false;
 	
 	static {
 		try {
@@ -130,10 +132,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		if (inGame) {
 			//Call the battle's main function
 			try {
-//				System.out.println(Game.class.getClassLoader().getResource("example/Main.class"));
 				Class.forName("battles." + battleName + ".Main").getMethod("main", int.class).invoke(null, frame);
-//				PyCode code = Python.open(new File(Files.dir + "\\battles\\"+battleName+"\\main.py"));
-//				Python.exec(code);
 			} catch (Throwable ignored) {
 				ignored.printStackTrace();
 			}
@@ -144,6 +143,11 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			else if (menuItem > 3) menuItem = 0;
 			
 			if (inAttack) {
+				if (inResponse) {
+					playerX = boardX;
+					playerY = boardY;
+					inResponse = false;
+				}
 				handleControls(soulType);
 				//Min and max didn't work, so I have to use this
 				if (playerX < (boardX + 7) - Math.abs((boardWidth / 2)))
@@ -160,7 +164,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 				}
 				invul--;
 				if (invul <= 0) invul = 0;
-			} else {
+			} else if (!inMenu) {
 				if (keysCodes.contains(KeyEvent.VK_LEFT)) {
 					menuItem -= 1;
 					keysCodes.remove((Integer) KeyEvent.VK_LEFT);
@@ -186,12 +190,53 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 				boardX = (442 / 2f - 13) - (width / 2f);
 				boardWidth = width;
 				if (keysCodes.contains(KeyEvent.VK_ENTER)) {
-					inAttack = true;
+//					inAttack = true;
+					inMenu = true;
 					playerX = boardX;
 					playerY = boardY;
+					keysCodes.remove((Integer)KeyEvent.VK_ENTER);
 				}
 				invul = 0;
 //				System.out.println((99-20f)/20);
+			} else if (!inResponse) {
+				try {
+					String menuType = "";
+					switch (menuItem) {
+						case 0:
+							menuType = "fight";
+							break;
+						case 1:
+							menuType = "act";
+							break;
+						case 2:
+							menuType = "item";
+							break;
+						case 3:
+							menuType = "mercy";
+							break;
+					}
+					ArrayList<String> elements = new ArrayList<>();
+					Class.forName("battles." + battleName + ".UI").getMethod("fillMenu", String.class, ArrayList.class).invoke(null, menuType, elements);
+					switch (menuElement) {
+						case 0:
+							playerX = -194;
+							playerY = 169;
+							break;
+					}
+					if (keysCodes.contains(KeyEvent.VK_ENTER)) {
+						playerX = boardX;
+						playerY = boardY;
+						inResponse = true;
+						inAttack = false;
+						inMenu = false;
+					}
+				} catch (Throwable ignored) {
+					inAttack = true;
+					ignored.printStackTrace();
+				}
+			} else {
+				playerX = 10000;
+				playerY = 10000;
 			}
 		}
 		
@@ -230,7 +275,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 					playerVelocY += 0.05;
 				}
 				if (keysCodes.contains(KeyEvent.VK_DOWN))
-					playerVelocY = 0.5;
+					playerVelocY = Math.max(0.5,playerVelocY);
 				playerY += playerVelocY;
 				break;
 		}

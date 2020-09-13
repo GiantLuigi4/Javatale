@@ -22,10 +22,12 @@ public class Launch {
 			ArrayList<File> allBattles = new ArrayList<>();
 			File[] files = new File(Files.dir + "\\battles").listFiles();
 			for (File f : files) {
-				if (f.isDirectory())
+				if (f.isDirectory()) {
 					for (File f1 : f.listFiles())
 						if (f1.getName().endsWith(".jar") || f1.getName().endsWith(".zip") || f1.isDirectory())
 							allBattles.add(f1);
+				} else if (f.getName().endsWith(".jar") || f.getName().endsWith(".zip"))
+					allBattles.add(f);
 			}
 			allBattles.addAll(getFileList());
 			dependencyManager = Manager.constructFromDependencies(GroovyFlameClassLoader.class,

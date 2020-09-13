@@ -249,12 +249,27 @@ public class FontRenderer {
 				sx = 8;
 				dy = 140;
 				sy = 10;
-				ySize = (int) (25 / 1.6);
+				additionalWidth = -3;
+				ySize = (int) (25 / 1.5);
 				yOff = 4;
+				break;
+			case '.':
+				dx = 64;
+				sx = 1;
+				dy = 40;
+				sy = 10;
 				break;
 			case '/':
 				dx = 125;
 				sx = 5;
+				dy = 50;
+				sy = 10;
+				xOff = 2;
+				additionalWidth = 2;
+				break;
+			case '-':
+				dx = 115;
+				sx = 4;
 				dy = 50;
 				sy = 10;
 				xOff = 2;

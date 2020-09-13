@@ -1,4 +1,4 @@
-package battles.example;
+package assorted_projectiles;
 
 import game.Game;
 import game.utils.Projectile;
@@ -9,12 +9,15 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class SnakeProjectile extends Projectile {
-	private final Projectile parent;
-	private final Projectile head;
-	private int shake = 0;
+	public final Projectile parent;
+	public Projectile child;
+	public final Projectile head;
+	public int shake = 0;
 	public boolean containsPlayer = false;
 	public boolean collidesOther = false;
 	public int collisionCount = 0;
+	public boolean isSolid = true;
+	public boolean bodyRenderResource = false;
 	
 	public SnakeProjectile(int x, int y, Consumer<Projectile> motion, Consumer<Projectile> render, Projectile parent, Projectile head) {
 		super(x, y, motion, render);
@@ -123,31 +126,27 @@ public class SnakeProjectile extends Projectile {
 //					}
 				} else {
 					if (head instanceof SnakeProjectile && ((SnakeProjectile) head).containsPlayer) {
-					} else {
-						if (Game.playerX < this.x)
-							Game.playerX = Game.lerp(0.075f,(float)Game.playerX,(float)(this.x - this.width / 1.0D));
-						else if (Game.playerX > this.x)
-							Game.playerX = Game.lerp(0.075f,(float)Game.playerX,(float)(this.x + this.width / 1.0D));
-						else {
-							Game.playerX = this.x;
-							containsPlayer = true;
-						}
+					} else if (isSolid) {
 						if (Game.playerY < this.y) {
-							if (Game.soulType == 1) {
-								Game.playerY = Game.lerp(0.025f,(float)Game.playerY,(float)(this.y - this.height / 1.0D));
-							}
-							Game.playerY = Game.lerp(0.075f,(float)Game.playerY,(float)(this.y - this.height / 1.0D));
+							if (Game.soulType == 1)
+								Game.playerY = Game.lerp(0.5f, (float) Game.playerY, (float) (this.y - this.height / 1.1D));
+							Game.playerY = Game.lerp(0.075f, (float) Game.playerY, (float) (this.y - this.height / 2D));
 							Game.jumpTime = 0;
 							Game.playerVelocY = 0;
-						}
-						else if (Game.playerY > this.y) {
-							if (Game.soulType == 1) {
-								Game.playerY = Game.lerp(0.025f,(float)Game.playerY,(float)(this.y + this.height / 1.0D));
-							}
-							Game.playerY = Game.lerp(0.075f,(float)Game.playerY,(float)(this.y + this.height / 1.0D));
-						}
-						else {
+						} else if (Game.playerY > this.y) {
+							if (Game.soulType == 1)
+								Game.playerY = Game.lerp(0.5f, (float) Game.playerY, (float) (this.y + this.height / 1.1D));
+							Game.playerY = Game.lerp(0.075f, (float) Game.playerY, (float) (this.y + this.height / 2D));
+						} else {
 							Game.playerY = this.y;
+							containsPlayer = true;
+						}
+						if (Game.playerX < this.x)
+							Game.playerX = Game.lerp(0.075f, (float) Game.playerX, (float) (this.x - this.width / 1.0D));
+						else if (Game.playerX > this.x)
+							Game.playerX = Game.lerp(0.075f, (float) Game.playerX, (float) (this.x + this.width / 1.0D));
+						else {
+							Game.playerX = this.x;
 							containsPlayer = true;
 						}
 					}
@@ -156,6 +155,8 @@ public class SnakeProjectile extends Projectile {
 					((SnakeProjectile) head).collidesOther = true;
 					((SnakeProjectile) head).collisionCount += 1;
 				}
+				if (parent instanceof SnakeProjectile)
+					((SnakeProjectile) parent).child = this;
 				if (this.parent == null) {
 					containsPlayer = true;
 				}
@@ -169,18 +170,22 @@ public class SnakeProjectile extends Projectile {
 	
 	@Override
 	public void render(Graphics2D g2d) throws IOException {
-		super.render(g2d);
+		if (this.child == null || this.parent == null) super.render(g2d);
 		g2d.setColor(new Color(255,255,255));
 		if (this.parent != null) {
 			try {
 				AffineTransform source = g2d.getTransform();
 				g2d.translate((this.x + this.parent.x)/2f,(this.y + this.parent.y)/2f);
 				g2d.scale(1,1);
+				int scale = 16;
 				//https://stackoverflow.com/questions/2839508/java2d-increase-the-line-width0
-				g2d.setStroke(new BasicStroke(15));
-				g2d.drawLine(0,0,(int)((parent.x-this.x)/3),(int)((parent.y-this.y)/3));
+				g2d.setStroke(new BasicStroke(16*scale));
+				g2d.scale(1f/scale,1f/scale);
+				if (this.parent == this.head) g2d.drawLine(0,0,(int)((parent.x-this.x)*(scale/8f)),(int)((parent.y-this.y)*(scale/8f)));
+				else g2d.drawLine(0,0,(int)((parent.x-this.x)*(scale))/4,(int)((parent.y-this.y)*(scale))/4);
 				g2d.setTransform(source);
 			} catch (Throwable ignored) {}
+			if (bodyRenderResource) super.render(g2d);
 		}
 	}
 }

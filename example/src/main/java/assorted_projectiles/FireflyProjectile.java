@@ -1,4 +1,4 @@
-package battles.example;
+package assorted_projectiles;
 
 import game.Game;
 import game.utils.Projectile;
@@ -55,9 +55,7 @@ public class FireflyProjectile extends Projectile {
 		} else {
 			this.x = Game.lerp(progress, (float) xStart, (float) xTarg);
 			this.y = Game.lerp(progress, (float) yStart, (float) yTarg);
-//		progress = Game.lerp((1 - progress) / 64f, progress, 1);
 			progress += (1 - progress) / 64f;
-//		progress += 0.00001f;
 		}
 		
 		super.update();
