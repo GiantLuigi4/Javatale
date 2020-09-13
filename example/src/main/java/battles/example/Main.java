@@ -15,6 +15,8 @@ public class Main {
 	
 	public static void main(int frame) {
 		Game.soulType = 0;
+		Game.globalOffsetX = 0;
+		Game.globalOffsetY = 0;
 		if (Game.inAttack) {
 			if (!inAttack)
 				attackNum = rng.nextDouble();
@@ -88,7 +90,7 @@ public class Main {
 						(Proj) -> {
 						}
 				);
-				proj.maxDelay = 1000;
+				proj.maxDelay = 100;
 				Game.projectiles.add(proj);
 			}
 		}
