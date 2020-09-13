@@ -3,22 +3,12 @@ package boot;
 import com.tfc.flame.FlameConfig;
 import com.tfc.flame.FlameLog;
 import com.tfc.utils.Files;
-import com.tfc.utils._flame.FlameLoader;
 import com.tfc.utils._flame.dependency_management.Manager;
 import com.tfc.utils.groovy.flame.GroovyFlameClassLoader;
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovyResourceLoader;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -37,15 +27,7 @@ public class Launch {
 						if (f1.getName().endsWith(".jar") || f1.getName().endsWith(".zip") || f1.isDirectory())
 							allBattles.add(f1);
 			}
-			allBattles.addAll(
-					Arrays.asList(
-							new File(Files.dir + "\\Javatale.jar"),
-							new File(Files.dir + "\\src\\main\\js"),
-							new File(Files.dir + "\\build\\classes\\java\\main"),
-							new File(Files.dir + "\\build\\classes\\resources"),
-							new File(Files.dir)
-					)
-			);
+			allBattles.addAll(getFileList());
 			dependencyManager = Manager.constructFromDependencies(GroovyFlameClassLoader.class,
 					"libs/jython.zip,https://repo1.maven.org/maven2/org/python/jython/2.7.0/jython-2.7.0.jar," +
 							"libs/scala.zip,https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.12/scala-library-2.11.12.jar," +
@@ -108,5 +90,19 @@ public class Launch {
 			return "libs/kotlin.zip,https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.4.10/kotlin-stdlib-1.4.10.jar,";
 		else
 			return "libs/kotlin-" + Package + ".zip,https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-" + Package + "/1.4.10/kotlin-" + Package + "-1.4.10.jar,";
+	}
+	
+	public static ArrayList<File> getFileList() {
+		ArrayList<File> files = new ArrayList<>();
+		Arrays.asList(
+				new File(Files.dir + "\\Javatale.jar"),
+				new File(Files.dir + "\\src\\main\\js"),
+				new File(Files.dir + "\\build\\classes\\java\\main"),
+				new File(Files.dir + "\\build\\classes\\resources"),
+				new File(Files.dir)
+		).forEach(f -> {
+			if (f.exists()) files.add(f);
+		});
+		return files;
 	}
 }
