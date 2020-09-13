@@ -5,14 +5,19 @@ An undertale fangame engine built in java, which supports multiple programming l
 ​
 
 Here's a list of everything currently supported:
+
 -Java
+
 -Groovy
+
 -Kotlin (I think, I don't have much of a way to test this one)
 
 ​
 
 And I plan to support
+
 -LUA (which caused me to make this, because I don't like LUA)
+
 -Python (which will likely require me to make my own interpreter because Jython is wierd and doesn't work properly afaik)
 
 ​
