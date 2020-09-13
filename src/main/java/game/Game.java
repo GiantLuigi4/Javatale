@@ -63,6 +63,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static int lvl = 20;
 	public static int hp = 20;
 	public static int invul = 0;
+	public static String name = "Frisk";
 	
 	//Battle memory (because python interpreter is being wacky)
 	//Need to make my own python interpreter at some point
@@ -297,6 +298,6 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	}
 	
 	public static float lerp(float pct, float start, float end) {
-		return ((start * (pct)) + (end * (1 - pct)));
+		return ((start * (1 - pct)) + (end * (pct)));
 	}
 }

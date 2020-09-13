@@ -42,7 +42,7 @@ public class Display extends JComponent {
 			g2d.scale(Game.globalScaleX, Game.globalScaleY);
 			
 			float xC = 0;
-			for (char c : "chara".toCharArray())
+			for (char c : Game.name.toLowerCase().toCharArray())
 				xC += Game.font.draw(c, -225 + (int) xC, 253, g2d) + 2f;
 			
 			for (char c : ("lv " + Game.lvl).toCharArray())
@@ -83,7 +83,7 @@ public class Display extends JComponent {
 				assert soul != null;
 				BufferedImage image = ImageIO.read(soul);
 				Color c = g2d.getColor();
-				Color recolored = new Color(c.getRed(), c.getBlue(), c.getGreen(), Game.invul >= 1 ? 128 : 255);
+				Color recolored = new Color(c.getRed(), c.getGreen(), c.getBlue(), Game.invul >= 1 ? 128 : 255);
 				colorSoul(image, recolored);
 				int size = 12;
 				g2d.drawImage(
@@ -222,7 +222,8 @@ public class Display extends JComponent {
 			for (int i = 0; i < Game.projectiles.size(); i++) {
 				Projectile proj = Game.projectiles.get(i);
 				try {
-					proj.render(g2d);
+					if (proj!=null)
+						proj.render(g2d);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

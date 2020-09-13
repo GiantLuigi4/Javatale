@@ -5,4 +5,5 @@
 /.idea/
 /libs/
 /build/
-/ExampleBattle/build/
+/example/build/
+/example/out/
