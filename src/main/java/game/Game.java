@@ -12,10 +12,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	//Game variables
@@ -29,8 +30,8 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static boolean inMenu = false;
 	public static int menuItem = 0;
 	public static int menuElement = 0;
-	public static final FontRenderer font;
-	public static final int[] healths = new int[20];
+	public static FontRenderer font;
+	public static int[] healths = new int[20];
 	public static boolean inResponse = false;
 	
 	static {
@@ -74,60 +75,13 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	public static HashMap<String, Object> memory = new HashMap<>();
 	
 	//Executing directory
-	public static final String dir = System.getProperty("user.dir");
+	public static String dir = System.getProperty("user.dir");
 	
 	//Display
 	public static JFrame gameFrame = new JFrame("Javatale");
-	public static final Display disp = new Display();
-	
-	public static void main(String[] args) {
-//		gameFrame.setSize(248 * 2, 200 * 2);
-		int width = 656;
-		int height = 515;
-		Toolkit tk = Toolkit.getDefaultToolkit();
-		gameFrame.setSize(width, height);
-		gameFrame.setLocation(
-				tk.getScreenSize().width / 2 - (width / 2),
-				tk.getScreenSize().height / 2 - (height / 2) + 1
-		);
-		gameFrame.setResizable(false);
-		gameFrame.add(disp);
-		String healthsText = "20\n24\n28\n32\n36\n40\n44\n48\n52\n56\n60\n64\n68\n72\n76\n80\n84\n88\n92\n99\n";
-		String[] vals = healthsText.split("\n");
-		for (int i = 0; i < 20; i++) healths[i] = Integer.parseInt(vals[i].replace("\n", ""));
-		hp = healths[lvl - 1];
-		try {
-			InputStream soulStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
-			InputStream iconStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/icon.png");
-			assert soulStream != null;
-			BufferedImage soul = ImageIO.read(soulStream);
-			assert iconStream != null;
-			BufferedImage icon = ImageIO.read(iconStream);
-			Display.colorSoul(soul, new Color(255, 0, 0));
-			BufferedImage disp = new BufferedImage(soul.getWidth() * 2, soul.getHeight() * 2, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g2d = (Graphics2D) disp.getGraphics();
-			g2d.scale(2, 2);
-			g2d.drawImage(soul, 0, 0, null);
-			g2d.translate(8, 8);
-			g2d.scale(0.5f, 0.5f);
-			g2d.drawImage(icon, 0, 0, null);
-			gameFrame.setIconImage(disp);
-		} catch (Throwable ignored) {
-		}
-		Game listeners = new Game();
-		gameFrame.addKeyListener(listeners);
-		gameFrame.addMouseMotionListener(listeners);
-		gameFrame.addMouseListener(listeners);
-		gameFrame.setVisible(true);
-		while (gameFrame.isVisible()) {
-			try {
-				loop(frameNumber);
-			} catch (Throwable ignored) {
-			}
-			frameNumber++;
-		}
-		Runtime.getRuntime().exit(0);
-	}
+	public static Display disp = new Display();
+	//Inputs
+	public static ArrayList<Character> keys = new ArrayList<>();
 	
 	public static void loop(int frame) throws FileNotFoundException {
 		Date time = new Date();
@@ -306,9 +260,8 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		}
 	}
 	
-	//Inputs
-	public static final ArrayList<Character> keys = new ArrayList<>();
-	public static final ArrayList<Integer> keysCodes = new ArrayList<>();
+	public static ArrayList<Integer> keysCodes = new ArrayList<>();
+	private static HashMap<String, ArrayList<BiObject<String, Object>>> resetables = new HashMap();
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -371,20 +324,76 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		return ((start * (1 - pct)) + (end * (pct)));
 	}
 	
-	private static final HashMap<String, ArrayList<BiObject<String, Object>>> resetables = new HashMap();
+	public static void main(String[] args) {
+//		gameFrame.setSize(248 * 2, 200 * 2);
+		markResetable("game.Game");
+		int width = 656;
+		int height = 515;
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		gameFrame.setSize(width, height);
+		gameFrame.setLocation(
+				tk.getScreenSize().width / 2 - (width / 2),
+				tk.getScreenSize().height / 2 - (height / 2) + 1
+		);
+		gameFrame.setResizable(false);
+		gameFrame.add(disp);
+		String healthsText = "20\n24\n28\n32\n36\n40\n44\n48\n52\n56\n60\n64\n68\n72\n76\n80\n84\n88\n92\n99\n";
+		String[] vals = healthsText.split("\n");
+		for (int i = 0; i < 20; i++) healths[i] = Integer.parseInt(vals[i].replace("\n", ""));
+		hp = healths[lvl - 1];
+		try {
+			InputStream soulStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/soul.png");
+			InputStream iconStream = Game.class.getClassLoader().getResourceAsStream("assets/builtin/icon.png");
+			assert soulStream != null;
+			BufferedImage soul = ImageIO.read(soulStream);
+			assert iconStream != null;
+			BufferedImage icon = ImageIO.read(iconStream);
+			Display.colorSoul(soul, new Color(255, 0, 0));
+			BufferedImage disp = new BufferedImage(soul.getWidth() * 2, soul.getHeight() * 2, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2d = (Graphics2D) disp.getGraphics();
+			g2d.scale(2, 2);
+			g2d.drawImage(soul, 0, 0, null);
+			g2d.translate(8, 8);
+			g2d.scale(0.5f, 0.5f);
+			g2d.drawImage(icon, 0, 0, null);
+			gameFrame.setIconImage(disp);
+		} catch (Throwable ignored) {
+		}
+		Game listeners = new Game();
+		gameFrame.addKeyListener(listeners);
+		gameFrame.addMouseMotionListener(listeners);
+		gameFrame.addMouseListener(listeners);
+		gameFrame.setVisible(true);
+		while (gameFrame.isVisible()) {
+			try {
+				loop(frameNumber);
+			} catch (Throwable ignored) {
+			}
+			frameNumber++;
+		}
+		Runtime.getRuntime().exit(0);
+	}
 	
 	public static void markResetable(String className) {
 		try {
 			if (!resetables.containsKey(className)) {
 				for (Field f : Class.forName(className).getFields()) {
+					f.setAccessible(true);
 					try {
-						if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
+						if (f.toString().contains("public"))
+							if (f.toString().contains("static"))
+								if (!f.toString().contains("final"))
+									Game.markResetable(className, f.getName(), f.get(null));
 					} catch (Throwable ignored) {
 					}
 				}
 				for (Field f : Class.forName(className).getDeclaredFields()) {
+					f.setAccessible(true);
 					try {
-						if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
+						if (f.toString().contains("public"))
+							if (f.toString().contains("static"))
+								if (!f.toString().contains("final"))
+									Game.markResetable(className, f.getName(), f.get(null));
 					} catch (Throwable ignored) {
 					}
 				}
@@ -397,9 +406,8 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		if (!resetables.containsKey(className))
 			resetables.put(className, new ArrayList<>());
 		boolean hasField = false;
-		for (BiObject<String, Object> obj : resetables.get(className)) {
+		for (BiObject<String, Object> obj : resetables.get(className))
 			if (obj.getObject1().equals(fieldName)) hasField = true;
-		}
 		if (!hasField) resetables.get(className).add(new BiObject<>(fieldName, value));
 	}
 	
@@ -413,12 +421,65 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 				Class<?> c = Class.forName(clazz);
 				list.forEach(obj -> {
 					try {
-						c.getField(obj.getObject1()).set(null, obj.getObject2());
-					} catch (IllegalAccessException | NoSuchFieldException e) {
-						e.printStackTrace();
+						Field f = c.getField(obj.getObject1());
+						f.setAccessible(true);
+						if (f.toString().contains("public"))
+							if (f.toString().contains("static"))
+								if (!f.toString().contains("final"))
+									f.set(null, obj.getObject2());
+					} catch (Throwable err0) {
+						try {
+							Field f = c.getDeclaredField(obj.getObject1());
+							f.setAccessible(true);
+							if (f.toString().contains("public"))
+								if (f.toString().contains("static"))
+									if (!f.toString().contains("final"))
+										f.set(null, obj.getObject2());
+						} catch (Throwable err1) {
+							try {
+								Method m = c.getMethod("set" + obj.getObject1().substring(0, 1).toUpperCase() + obj.getObject1().substring(1), obj.getObject2().getClass());
+								m.setAccessible(true);
+								m.invoke(null, obj.getObject2());
+							} catch (Throwable err2) {
+								try {
+									Method m = c.getDeclaredMethod("set" + obj.getObject1().substring(0, 1).toUpperCase() + obj.getObject1().substring(1), obj.getObject2().getClass());
+									m.setAccessible(true);
+									m.invoke(null, obj.getObject2());
+								} catch (Throwable err3) {
+									try {
+										Field f = c.getField(obj.getObject1());
+										f.setAccessible(true);
+										System.out.println("Failed to reset field: " + f.toString() + " to " + obj.getObject2());
+									} catch (Throwable err4) {
+										try {
+											Field f = c.getDeclaredField(obj.getObject1());
+											f.setAccessible(true);
+											System.out.println("Failed to reset field: " + f.toString() + " to " + obj.getObject2());
+										} catch (Throwable ignored) {
+										}
+									}
+								}
+							}
+						}
+					}
+					try {
+						Field f = c.getField(obj.getObject1());
+						f.setAccessible(true);
+						if (!f.get(null).equals(obj.getObject2()))
+							System.out.println("Failed to reset field: " + f.toString() + " to " + obj.getObject2());
+					} catch (Throwable err0) {
+						try {
+							Field f = c.getDeclaredField(obj.getObject1());
+							f.setAccessible(true);
+							if (!f.get(null).equals(obj.getObject2()))
+								System.out.println("Failed to reset field: " + f.toString() + " to " + obj.getObject2());
+						} catch (Throwable ignored) {
+						}
 					}
 				});
-			} catch (ClassNotFoundException e) {
+				if (!clazz.equals("game.Game"))
+					c.getMethod("reset").invoke(null);
+			} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		});

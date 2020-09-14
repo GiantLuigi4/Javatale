@@ -1,14 +1,14 @@
 package battles.example;
 
 import assorted_projectiles.FireflyProjectile;
-//import assorted_projectiles.SnakeProjectile;
 import game.Game;
 import game.utils.Projectile;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.lang.reflect.Field;
 import java.util.Random;
+
+//import assorted_projectiles.SnakeProjectile;
 
 public class Main {
 	public static int num = 100;
@@ -27,32 +27,8 @@ public class Main {
 			"This is the last message, it will\nrandomly cycle through the messages \nfrom here."
 	};
 	
-	private static boolean hasInit = false;
-	
-	private static void init() {
-		if (!hasInit) {
-			hasInit = true;
-			for (Field f : Main.class.getFields()) {
-				try {
-					if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
-				} catch (Throwable ignored) {
-				}
-			}
-			for (Field f : Main.class.getDeclaredFields()) {
-				try {
-					if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
-				} catch (Throwable ignored) {
-				}
-			}
-		}
-	}
-	
 	public static void main(int frame) {
-		init();
-		Game.markResetable("battles.example.Main","num",100);
-		Game.markResetable("battles.example.Main","num2",0);
-		Game.markResetable("battles.example.Main","attackNum",0);
-		Game.markResetable("battles.example.Main","messageProgress",0);
+		Game.markResetable(Main.class.getName());
 		Game.soulType = 0;
 		Game.globalOffsetX = 0;
 		Game.globalOffsetY = 0;
@@ -241,4 +217,33 @@ public class Main {
 //			num = 0;
 //		}
 //	}
+	
+	//These setters are fallbacks for the reset method
+	public static void setNum(int num) {
+		Main.num = num;
+	}
+	
+	public static void setNum2(int num2) {
+		Main.num2 = num2;
+	}
+	
+	public static void setAttackNum(double attackNum) {
+		Main.attackNum = attackNum;
+	}
+	
+	public static void setInAttack(boolean inAttack) {
+		Main.inAttack = inAttack;
+	}
+	
+	public static void setMessageProgress(float messageProgress) {
+		Main.messageProgress = messageProgress;
+	}
+	
+	public static void setAttacksDone(int attacksDone) {
+		Main.attacksDone = attacksDone;
+	}
+	
+	public static void setMsgNum(int msgNum) {
+		Main.msgNum = msgNum;
+	}
 }
