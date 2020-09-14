@@ -1,5 +1,6 @@
 package game;
 
+import com.tfc.utils.BiObject;
 import game.utils.Projectile;
 
 import javax.imageio.ImageIO;
@@ -196,7 +197,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 					inMenu = true;
 					playerX = boardX;
 					playerY = boardY;
-					keysCodes.remove((Integer)KeyEvent.VK_ENTER);
+					keysCodes.remove((Integer) KeyEvent.VK_ENTER);
 				}
 				invul = 0;
 //				System.out.println((99-20f)/20);
@@ -263,7 +264,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			menuItem = 0;
 			inMenu = false;
 			inAttack = false;
-			hp = healths[lvl-1];
+			hp = healths[lvl - 1];
 		}
 		
 		disp.repaint();
@@ -301,7 +302,7 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 					playerVelocY += 0.05;
 				}
 				if (keysCodes.contains(KeyEvent.VK_DOWN))
-					playerVelocY = Math.max(0.5,playerVelocY);
+					playerVelocY = Math.max(0.5, playerVelocY);
 				playerY += playerVelocY;
 				break;
 		}
@@ -370,5 +371,34 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	
 	public static float lerp(float pct, float start, float end) {
 		return ((start * (1 - pct)) + (end * (pct)));
+	}
+	
+	private static final HashMap<String, ArrayList<BiObject<String, Object>>> resetables = new HashMap();
+	
+	public static void markResetable(String className, String fieldName, Object value) {
+		if (!resetables.containsKey(className))
+			resetables.put(className, new ArrayList<>());
+		boolean hasField = false;
+		for (BiObject<String, Object> obj : resetables.get(className)) {
+			if (obj.getObject1().equals(fieldName)) hasField = true;
+		}
+		if (!hasField) resetables.get(className).add(new BiObject<>(fieldName, value));
+	}
+	
+	public static void reset() {
+		resetables.forEach((clazz, list) -> {
+			try {
+				Class<?> c = Class.forName(clazz);
+				list.forEach(obj -> {
+					try {
+						c.getField(obj.getObject1()).set(null, obj.getObject2());
+					} catch (IllegalAccessException | NoSuchFieldException e) {
+						e.printStackTrace();
+					}
+				});
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 }

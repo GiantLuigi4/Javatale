@@ -34,7 +34,7 @@ public class Main {
 			messageProgress = 0;
 			if (!inAttack)
 				attackNum = rng.nextDouble();
-//			attackNum = 1.5;
+			attackNum = 0;
 			if (attackNum * attackCount <= 1)
 				attack1(frame);
 			else if (attackNum * attackCount <= 2)
@@ -116,8 +116,8 @@ public class Main {
 	public static void attack1(int frame) {
 		Game.boardWidth = Math.sin(frame / 300f) * 30 + 300;
 		Game.boardHeight = 300;
-		Game.boardX = Math.cos((frame + Game.playerX) / 32f);
-		Game.boardY = Math.sin((frame + Game.playerY) / 32f);
+		Game.boardX = Math.cos((frame + Game.playerX) / 32f) * 32;
+		Game.boardY = Math.sin((frame + Game.playerY) / 32f) * 32;
 		if (num >= 120) {
 			int count = 8;
 			for (int i = 0; i < count; i++) {
