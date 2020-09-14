@@ -238,7 +238,9 @@ public class Display extends JComponent {
 						int xPos = -197;
 						int yPos = 156;
 						if (i == 0) {
-							for (char c:(("      *  ") + element.toLowerCase()).toCharArray())
+							String texta = element;
+							if (texta.startsWith("y:")) texta = texta.substring("y:".length());
+							for (char c:(("      *  ") + texta.toLowerCase()).toCharArray())
 								xPos += Game.font.draw(c, xPos, yPos, g2d) + 2;
 						}
 					}

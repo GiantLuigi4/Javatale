@@ -6,23 +6,24 @@ import game.Game;
 import game.utils.Projectile;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 
 public class Main {
-	private static int num = 100;
-	private static int num2 = 0;
-	private static double attackNum = 0;
-	private static final Random rng = new Random();
-	private static boolean inAttack = false;
-	private static final int attackCount = 2;
-	private static float messageProgress = 0;
-	private static int attacksDone = 0;
-	private static int msgNum = 0;
-	private static final String[] messages = new String[]{
+	public static int num = 100;
+	public static int num2 = 0;
+	public static double attackNum = 0;
+	public static final Random rng = new Random();
+	public static boolean inAttack = false;
+	public static final int attackCount = 2;
+	public static float messageProgress = 0;
+	public static int attacksDone = 0;
+	public static int msgNum = 0;
+	public static final String[] messages = new String[]{
 			"Hello, welcome to the example battle.",
 			"This battle has a total of " + attackCount + "\nimplemented attacks.",
 			"It also has a total of " + 4 + " messages.",
-			"This is the last message, it will\nrandomly cycle through the messages from here"
+			"This is the last message, it will\nrandomly cycle through the messages \nfrom here."
 	};
 	
 	public static void main(int frame) {
@@ -59,6 +60,9 @@ public class Main {
 			if (messageProgress > messages[msgNum].length()+3) {
 				messageProgress = messages[msgNum].length()+3;
 			}
+			if (Game.keysCodes.contains(KeyEvent.VK_Z)) {
+				messageProgress = messages[msgNum].length()+3;
+			}
 			int i = 0;
 			int x = -209;
 			int y = 156;
@@ -74,6 +78,37 @@ public class Main {
 					x+=3;
 				}
 				i++;
+			}
+		} else if (Game.inResponse) {
+			if (UI.displayText.equals("")) {
+				Game.inAttack = true;
+			} else {
+				if (Game.keysCodes.contains(KeyEvent.VK_ENTER)) {
+					Game.inAttack = true;
+				}
+				if (Game.keysCodes.contains(KeyEvent.VK_Z)) {
+					messageProgress = UI.displayText.length()+3;
+				}
+				messageProgress+=0.1f;
+				if (messageProgress > UI.displayText.length()+3) {
+					messageProgress = UI.displayText.length()+3;
+				}
+				int i = 0;
+				int x = -209;
+				int y = 156;
+				for (char c : ("*  " + UI.displayText).toLowerCase().toCharArray()) {
+					if (i <= messageProgress) {
+						x += Game.font.draw(c, x, y, g2d) + 2;
+					}
+					if (c == '\n') {
+						x = -186;
+						y += 16;
+					}
+					if (i >= 3 && c == ' ') {
+						x+=3;
+					}
+					i++;
+				}
 			}
 		}
 	}
@@ -111,7 +146,7 @@ public class Main {
 		}
 	}
 	
-	private static void attack2(int frame) {
+	public static void attack2(int frame) {
 		if (num % 50 == 0) {
 			int x = rng.nextInt(800) - 400;
 			int y = rng.nextInt(800) - 400;
@@ -151,7 +186,7 @@ public class Main {
 		}
 	}
 	
-//	private static void attack3(int frame) {
+//	public static void attack3(int frame) {
 //		Game.soulType = 1;
 //		Game.boardWidth = 600;
 //		Game.boardHeight = 600;

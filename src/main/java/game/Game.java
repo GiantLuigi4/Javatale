@@ -132,6 +132,11 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 		if (inGame) {
 			//Call the battle's main function
 			try {
+				if (inAttack && inResponse) {
+					playerX = boardX;
+					playerY = boardY;
+					inResponse = false;
+				}
 				Class.forName("battles." + battleName + ".Main").getMethod("main", int.class).invoke(null, frame);
 			} catch (Throwable ignored) {
 				ignored.printStackTrace();
@@ -143,11 +148,8 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			else if (menuItem > 3) menuItem = 0;
 			
 			if (inAttack) {
-				if (inResponse) {
-					playerX = boardX;
-					playerY = boardY;
-					inResponse = false;
-				}
+				inResponse = false;
+				inMenu = false;
 				handleControls(soulType);
 				//Min and max didn't work, so I have to use this
 				if (playerX < (boardX + 7) - Math.abs((boardWidth / 2)))
@@ -222,13 +224,28 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 							playerX = -194;
 							playerY = 169;
 							break;
+//						case 1:
+//							playerX = -194;
+//							playerY = 169;
+//							break;
 					}
 					if (keysCodes.contains(KeyEvent.VK_ENTER)) {
+						Class.forName("battles." + battleName + ".UI").getMethod("handleInput", String.class, String.class).invoke(null, menuType, elements.get(menuElement));
 						playerX = boardX;
 						playerY = boardY;
-						inResponse = true;
-						inAttack = false;
+						if (Game.inGame) {
+							inResponse = true;
+							inAttack = false;
+							inMenu = false;
+							playerX = 10000;
+							playerY = 10000;
+						}
+						menuElement = 0;
+					} else if (elements.isEmpty() || keysCodes.contains(KeyEvent.VK_Z)) {
+						menuElement = 0;
 						inMenu = false;
+						inResponse = false;
+						inAttack = false;
 					}
 				} catch (Throwable ignored) {
 					inAttack = true;
@@ -238,6 +255,15 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 				playerX = 10000;
 				playerY = 10000;
 			}
+		}
+		
+		if (keysCodes.contains(KeyEvent.VK_ESCAPE)) {
+			battleName = "";
+			inGame = false;
+			menuItem = 0;
+			inMenu = false;
+			inAttack = false;
+			hp = healths[lvl-1];
 		}
 		
 		disp.repaint();

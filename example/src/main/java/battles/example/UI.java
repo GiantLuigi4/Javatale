@@ -26,7 +26,7 @@ public class UI {
 					elements.add("Bandage");
 				break;
 			case "mercy":
-				elements.add("Spare");
+				elements.add("y:Spare");
 				elements.add("Flea");
 				break;
 			default:
@@ -35,12 +35,13 @@ public class UI {
 	}
 	
 	public static void handleInput(String menu, String input) {
+		Main.messageProgress = 0;
 		forceAttk = false;
 		displayText = "";
 		switch (menu) {
 			case "act":
 				if (input.equals("Check")) {
-					displayText = "Nothing 1 ATK 0 DEF\nIt is literally nothing";
+					displayText = "Nothing 1 ATK 0 DEF\nIt is literally nothing.";
 				} else if (input.equals("Attack1")) {
 					forceAttk = true;
 					attack = 1;
@@ -52,12 +53,16 @@ public class UI {
 			case "item":
 				displayText = "You used the bandage.\n10 HP restored.";
 				Game.hp += 10;
-				Game.hp = Math.max(Game.hp,Game.healths[Game.lvl-1]);
+				Game.hp = Math.min(Game.hp, Game.healths[Game.lvl - 1]);
+				hasBandage = false;
 				break;
 			case "mercy":
-				if (input.equals("Spare")) {
+				if (input.equals("y:Spare")) {
 					Game.battleName = "";
 					Game.inGame = false;
+					Game.menuItem = 0;
+					Game.inMenu = false;
+					Game.inAttack = false;
 				} else {
 					displayText = "";
 				}
