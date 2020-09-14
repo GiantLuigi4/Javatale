@@ -7,6 +7,7 @@ import game.utils.Projectile;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
 import java.util.Random;
 
 public class Main {
@@ -26,7 +27,32 @@ public class Main {
 			"This is the last message, it will\nrandomly cycle through the messages \nfrom here."
 	};
 	
+	private static boolean hasInit = false;
+	
+	private static void init() {
+		if (!hasInit) {
+			hasInit = true;
+			for (Field f : Main.class.getFields()) {
+				try {
+					if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
+				} catch (Throwable ignored) {
+				}
+			}
+			for (Field f : Main.class.getDeclaredFields()) {
+				try {
+					if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
+				} catch (Throwable ignored) {
+				}
+			}
+		}
+	}
+	
 	public static void main(int frame) {
+		init();
+		Game.markResetable("battles.example.Main","num",100);
+		Game.markResetable("battles.example.Main","num2",0);
+		Game.markResetable("battles.example.Main","attackNum",0);
+		Game.markResetable("battles.example.Main","messageProgress",0);
 		Game.soulType = 0;
 		Game.globalOffsetX = 0;
 		Game.globalOffsetY = 0;
@@ -34,7 +60,7 @@ public class Main {
 			messageProgress = 0;
 			if (!inAttack)
 				attackNum = rng.nextDouble();
-			attackNum = 0;
+//			attackNum = 0;
 			if (attackNum * attackCount <= 1)
 				attack1(frame);
 			else if (attackNum * attackCount <= 2)

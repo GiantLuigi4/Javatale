@@ -14,5 +14,5 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    compileOnly 'com.github.GiantLuigi4:Javatale:107ff7b5a6'
+    compileOnly 'com.github.GiantLuigi4:Javatale:75ba886f8e'
 }

@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -258,13 +259,10 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 			}
 		}
 		
-		if (keysCodes.contains(KeyEvent.VK_ESCAPE)) {
+		if (keysCodes.contains(KeyEvent.VK_ESCAPE) || hp <= 0) {
 			battleName = "";
 			inGame = false;
-			menuItem = 0;
-			inMenu = false;
-			inAttack = false;
-			hp = healths[lvl - 1];
+			reset();
 		}
 		
 		disp.repaint();
@@ -375,6 +373,26 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	
 	private static final HashMap<String, ArrayList<BiObject<String, Object>>> resetables = new HashMap();
 	
+	public static void markResetable(String className) {
+		try {
+			if (!resetables.containsKey(className)) {
+				for (Field f : Class.forName(className).getFields()) {
+					try {
+						if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
+					} catch (Throwable ignored) {
+					}
+				}
+				for (Field f : Class.forName(className).getDeclaredFields()) {
+					try {
+						if (f.isAccessible()) Game.markResetable("battles.example.Main", f.getName(), f.get(null));
+					} catch (Throwable ignored) {
+					}
+				}
+			}
+		} catch (Throwable ignored) {
+		}
+	}
+	
 	public static void markResetable(String className, String fieldName, Object value) {
 		if (!resetables.containsKey(className))
 			resetables.put(className, new ArrayList<>());
@@ -386,6 +404,10 @@ public class Game implements KeyListener, MouseMotionListener, MouseListener {
 	}
 	
 	public static void reset() {
+		menuItem = 0;
+		inMenu = false;
+		inAttack = false;
+		hp = healths[lvl - 1];
 		resetables.forEach((clazz, list) -> {
 			try {
 				Class<?> c = Class.forName(clazz);

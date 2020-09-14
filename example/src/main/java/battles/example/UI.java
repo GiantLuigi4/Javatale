@@ -63,6 +63,7 @@ public class UI {
 					Game.menuItem = 0;
 					Game.inMenu = false;
 					Game.inAttack = false;
+					Game.reset();
 				} else {
 					displayText = "";
 				}
